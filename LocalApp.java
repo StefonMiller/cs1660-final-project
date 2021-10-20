@@ -111,19 +111,29 @@ class LocalApp
     {
         
         File folder = new File(System.getProperty("user.dir"));
-        File[] listOfFiles = folder.listFiles();
+        ArrayList<File> listOfFiles = new ArrayList<>(Arrays.asList(folder.listFiles()));
         int choice = 0;
-        while(choice != -1)
+        while(choice != -1 && !listOfFiles.isEmpty())
         {
             System.out.println("\nCurrently chosen files: " + fNames);
             System.out.println("Please select a file(s) to add. Input -1 to confirm:\n");
             int i = 0;
             for(File f : listOfFiles)
-            {
-                i++;
-                System.out.println(i + ".\t" + f);
+            {  
+                if(!fNames.contains(f.getName()))
+                {
+                    i++;
+                    System.out.println(i + ".\t" + f);
+                }
             }
 
+            if(i == 0)
+            {
+                System.out.println("No files to add");
+                return fNames;
+            }
+
+            System.out.println();
             try
             {
                 choice = kb.nextInt();
@@ -136,9 +146,9 @@ class LocalApp
 
             if(choice >= 1 && choice <= i)
             {
-                if(!fNames.contains(listOfFiles[choice-1].getName()))
+                if(!fNames.contains(listOfFiles.get(choice-1).getName()))
                 {
-                    fNames.add(listOfFiles[choice-1].getName());
+                    fNames.add(listOfFiles.remove(choice-1).getName());
                 }
                 else
                 {
