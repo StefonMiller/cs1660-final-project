@@ -11,6 +11,6 @@ Final project option 2 for CS1660
    * ``RUN curl -sSL https://sdk.cloud.google.com | bash`` will be used to install gcloud on the Docker container
    * ``RUN javac LocalApp.java`` will be used to compile and execute my Java file
 2. Docker build command to create the container from my Dockerfile:
-   * ``docker build -t smm248/local-app``
+   * ``docker build -t smm248/local-app .``
 3. Docker run command used to create and start a container from the smm248/local-app image:
    * ``docker run -it smm248/local-app``, note I will be using the -it flag in order to interact with the container from the local terminal
