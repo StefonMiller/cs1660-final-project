@@ -5,7 +5,7 @@ Final project option 2 for CS1660
 2. After creating a service account, select it in the resulting window
 3. Open the 'Keys' tab for the service account and click 'Create new key'
 4. Download the key as a JSON file and move it to the same directory as the Dockerfile
-5. Create an environment variable GOOGLE_APPLICATION_CREDENTIALS in the Docker container pointing to the JSON file. This environment variable will allow gcloud to automatically      authenticate with GCP when a ``gcloud`` command is executed from my Java application using the ``Runtime.exec()`` function
+5. Create an environment variable GOOGLE_APPLICATION_CREDENTIALS in the Docker container pointing to the JSON file. This environment variable will allow gcloud to automatically      authenticate with GCP when a ``gcloud`` command is executed from my Java application using the ``ProcessBuilder`` class
 ## Build/run commands for local application
 1. RUN commands in Dockerfile: 
    * ``RUN curl -sSL https://sdk.cloud.google.com | bash`` will be used to install gcloud on the Docker container
