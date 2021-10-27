@@ -1,8 +1,9 @@
 import java.util.*;
 import java.io.File;
+import java.io.IOException;
 class LocalApp 
 {
-    public static void main(String args[]) 
+    public static void main(String args[]) throws IOException
     {
         //Files to index
         ArrayList<String> fileNames = new ArrayList<String>(10);
@@ -88,6 +89,7 @@ class LocalApp
                         else
                         {
                             System.out.println("Creating indices with " + fileNames.toString() + "\n");
+                            //TODO: Upload selected files to GCP using gcloud commands
                             indicesCreated = true;
                         }
                         break;
@@ -107,18 +109,22 @@ class LocalApp
      * Returns top-N query for a given search term
      * @param term
      */
-    public static void topN(String term)
+    public static void topN(String term) throws IOException
     {
         System.out.println("Doing top N with " + term);
+        String[] args = new String[] {"/bin/bash", "-c", "ls"};
+        Process proc = new ProcessBuilder(args).start();
     }
 
     /**
      * Searches for a given term in the indices
      * @param term
      */
-    public static void search(String term)
+    public static void search(String term) throws IOException
     {
         System.out.println("Doing search with term " + term);
+        String[] args = new String[] {"/bin/bash", "-c", "ls"};
+        Process proc = new ProcessBuilder(args).start();
     }
 
     /**
