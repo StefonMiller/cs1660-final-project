@@ -1,197 +1,178 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.io.*;
 import java.util.*;
-import java.io.File;
-import java.io.IOException;
-class LocalApp 
+import java.nio.file.Files;
+
+public class LocalApp
 {
-    public static void main(String args[]) throws IOException
+   public static void main(String[] args) 
     {
-        //Files to index
-        ArrayList<String> fileNames = new ArrayList<String>(10);
-        Scanner keyboard = new Scanner(System.in);
-        boolean indicesCreated = false;
-        
-        while(true)
+        //Create GUI window
+        new MainWindow();
+    }
+
+}
+
+class MainWindow implements ActionListener
+{
+    //UI components
+    JButton indexButton;
+    JButton searchButton;
+    JButton topNButton;
+    JButton searchPanelButton;
+    JButton topNPanelButton;
+    JFrame frame;
+    JPanel containerPanel;
+    JPanel searchPanel;
+    JPanel topNPanel;
+    JPanel indexPanel;
+    JTextArea textArea;
+    JTextField searchText;
+    JTextField topNText; 
+
+    public MainWindow()
+    {
+        //Create main frame
+        frame = new JFrame("Upload to hadoop");
+
+        //Panel for file choose button
+        JPanel panel1 = new JPanel();
+        indexButton = new JButton("Create indices");
+        indexButton.addActionListener(this); 
+        panel1.add(indexButton);
+
+        // Container panel for 3 previous panels
+        containerPanel = new JPanel();
+        containerPanel.setLayout(new GridBagLayout());
+
+        containerPanel.add(panel1);
+
+        //Make UI exit on close
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500,300);
+
+        frame.getContentPane().add(containerPanel);
+        frame.setVisible(true);
+
+
+        indexPanel = new JPanel(new GridLayout(3,1));
+        JPanel panel2 = new JPanel();
+        searchButton = new JButton("Search");
+        searchButton.addActionListener(this); 
+        panel2.add(searchButton);
+        JPanel panel3 = new JPanel();
+        topNButton = new JButton("Top N"); // Button is a Component
+        topNButton.addActionListener(this); 
+        panel3.add(topNButton);
+        JPanel panel4 = new JPanel();
+        textArea = new JTextArea();
+        Color color = panel4.getBackground ();
+        textArea.setBackground(color);
+        textArea.setEditable(false);
+        textArea.setText("Indices created!");
+        panel4.add(textArea);
+        indexPanel.add(panel4);
+        indexPanel.add(panel2);
+        indexPanel.add(panel3);
+
+        searchPanel = new JPanel(new GridLayout(3,1));
+        JPanel panel5 = new JPanel();
+        JTextArea search = new JTextArea();
+        search.setBackground(color);
+        search.setEditable(false);
+        search.setText("Please enter a search term:");
+        panel5.add(search);
+        JPanel panel6 = new JPanel();
+        searchText = new JTextField(20);
+        panel6.add(searchText);
+        JPanel panel7 = new JPanel();
+        searchPanelButton = new JButton("Search"); // Button is a Component
+        searchPanelButton.addActionListener(this); 
+        panel7.add(searchPanelButton);
+        searchPanel.add(panel5);
+        searchPanel.add(panel6);
+        searchPanel.add(panel7);
+
+        topNPanel = new JPanel(new GridLayout(3,1));
+        JPanel panel8 = new JPanel();
+        JTextArea topN = new JTextArea();
+        topN.setBackground(color);
+        topN.setEditable(false);
+        topN.setText("Please enter an N value:");
+        panel8.add(topN);
+        JPanel panel9 = new JPanel();
+        topNText = new JTextField(20);
+        panel9.add(topNText);
+        JPanel panel10 = new JPanel();
+        topNPanelButton = new JButton("Calculate"); // Button is a Component
+        topNPanelButton.addActionListener(this); 
+        panel10.add(topNPanelButton);
+        topNPanel.add(panel8);
+        topNPanel.add(panel9);
+        topNPanel.add(panel10);
+
+    }
+
+    /**
+     * Button event handler
+     * @Param e: Event registered
+     */
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource().equals(indexButton))
         {
-            //Display different menu if indices were created
-            if(indicesCreated)
-            {
-                //Prompt user to choose what to do
-                int choice = 0;
-                System.out.println("Please select an option:\n" +
-                                    "\t1. Search for term\n" +
-                                    "\t2. Top-N\n" +  
-                                    "\t3. Quit");
-                //Validate input
-                try
-                {
-                    choice = keyboard.nextInt();
-                    keyboard.nextLine();
-                }
-                catch(InputMismatchException ime)
-                {
-                    System.out.println("Invalid input");
-                    continue;
-                }
-                
-                switch(choice)
-                {
-                    //Search, topN, or quit depending on input
-                    case 1:
-                        System.out.println("Please enter your search term:");
-                        String searchTerm = keyboard.nextLine();
-                        search(searchTerm);
-                        break;
-                    case 2:
-                        System.out.println("Please enter your search term:");
-                        String topNSearchTerm = keyboard.nextLine();
-                        topN(topNSearchTerm);
-                        break;
-                    case 3:
-                        System.exit(0);
-                    default:
-                        System.out.println("Invalid input");
-                        break;
-                }
-            }
-            else
-            {
-                int choice = 0;
-                //Display main menu if indices not created
-                System.out.println("Currently chosen files:");
-                System.out.println(fileNames + "\n");
-                System.out.println("Please select an option:\n" +
-                                    "\t1. Add files\n" + 
-                                    "\t2. Create indices\n" +
-                                    "\t3. Quit");
-                //Validate input
-                try
-                {
-                    choice = keyboard.nextInt();
-                    keyboard.nextLine();
-                }
-                catch(InputMismatchException ime)
-                {
-                    System.out.println("Invalid input");
-                    continue;
-                }
-                //Add files, create indices, or quit depending on choice
-                switch(choice)
-                {
-                    case 1:
-                        fileNames = addFiles(fileNames, keyboard);
-                        break;
-                    case 2:
-                        //Ensure files were selected before creating indices
-                        if(fileNames.size() < 1)
-                        {
-                            System.out.println("Please add a file before creating indices");
-                        }
-                        else
-                        {
-                            System.out.println("Creating indices with " + fileNames.toString() + "\n");
-                            //TODO: Upload selected files to GCP using gcloud commands
-                            indicesCreated = true;
-                        }
-                        break;
-                    case 3:
-                        System.exit(0);
-                    default:
-                        System.out.println("Invalid input");
-                        break;
-                }
-            }
-            
+            frame.remove(containerPanel);
+            frame.add(indexPanel);
+            frame.validate();
+        }
+        //If the user clicked the upload button, call uploadFiles()
+        else if(e.getSource().equals(searchButton))
+        {
+            frame.remove(indexPanel);
+            frame.add(searchPanel);
+            frame.validate();
+        }
+        else if(e.getSource().equals(topNButton))
+        {
+            frame.remove(indexPanel);
+            frame.add(topNPanel);
+            frame.validate();
+        }
+        else if(e.getSource().equals(searchPanelButton))
+        {
+            search(searchText.getText());
+            //TODO: Switch frame to results panel
 
         }
-    }
-
-    /**
-     * Returns top-N query for a given search term
-     * @param term
-     */
-    public static void topN(String term) throws IOException
-    {
-        System.out.println("Doing top N with " + term);
-        String[] args = new String[] {"/bin/bash", "-c", "ls"};
-        Process proc = new ProcessBuilder(args).start();
-    }
-
-    /**
-     * Searches for a given term in the indices
-     * @param term
-     */
-    public static void search(String term) throws IOException
-    {
-        System.out.println("Doing search with term " + term);
-        String[] args = new String[] {"/bin/bash", "-c", "ls"};
-        Process proc = new ProcessBuilder(args).start();
-    }
-
-    /**
-     * Prompts user to add files to the indices
-     * @param fNames list of all files to add
-     * @param kb scanner object
-     * @return new list of files to add to indices
-     */
-    public static ArrayList<String> addFiles(ArrayList<String> fNames, Scanner kb)
-    {
-        //Get all files in current directory and convert to arraylist
-        File folder = new File(System.getProperty("user.dir"));
-        ArrayList<File> listOfFiles = new ArrayList<>(Arrays.asList(folder.listFiles()));
-        int choice = 0;
-        //Loop until arraylist is empty or user manually exits
-        while(choice != -1 && !listOfFiles.isEmpty())
+        else if(e.getSource().equals(topNPanelButton))
         {
-            System.out.println("\nCurrently chosen files: " + fNames);
-            System.out.println("Please select a file(s) to add. Input -1 to confirm:\n");
-            int i = 0;
-            //List all files not yet selected
-            for(File f : listOfFiles)
-            {  
-                if(!fNames.contains(f.getName()))
-                {
-                    i++;
-                    System.out.println(i + ".\t" + f);
-                }
-            }
-
-            //If i=0, then no files are valid to select
-            if(i == 0)
-            {
-                System.out.println("No files to add");
-                return fNames;
-            }
-
-            System.out.println();
-            //Validate input
             try
             {
-                choice = kb.nextInt();
+                int n = Integer.parseInt(topNText.getText());
+                topN(Integer.parseInt(topNText.getText()));
+                //TODO: Switch frame to results panel
             }
-            catch(InputMismatchException ime)
+            catch(NumberFormatException nfe)
             {
-                System.out.println("Invalid input");
-                continue;
-            }
-
-            if(choice >= 1 && choice <= i)
-            {
-                //Check if arraylist already has the given name
-                if(!fNames.contains(listOfFiles.get(choice-1).getName()))
-                {
-                    fNames.add(listOfFiles.remove(choice-1).getName());
-                }
-                else
-                {
-                    System.out.println("File name already in list");
-                }
-            }
-            else if(choice != -1)
-            {
-                System.out.println("Invalid input");
-                continue;
+                JOptionPane.showMessageDialog(frame, "Please enter a number");
             }
         }
-        return fNames;        
+    }
+
+    /**
+     * Searches the results of inverted indices for the matching term
+     */
+    public void search(String term)
+    {
+        System.out.println("Searching for term " + term);
+    }
+
+    /**
+     * Finds the top N words in the inverted indices
+     */
+    public void topN(int n)
+    {
+        System.out.println("Getting top " + Integer.toString(n) + " entries");
     }
 }
