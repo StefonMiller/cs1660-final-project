@@ -16,6 +16,7 @@ Final project option 2 for CS1660
 10. Basic errors are handled by the application, such as no results for a search or non-integer input for top-N. These are not demoed in the video(to save time) but should be noted just in case that is evaluated.
 11. Apostrophes are not removed in my inverted index algorithm. This is to avoid splitting contractions, all other special characters are removed
 12. Note: The errors in the code demo are because I had opened the code in the repository and not the code in the java projects I was using to test them
+13. After recording the code walkthrough, I added a `dependency` folder. This has all the dependencies I used when creating the `LocalApp.jar` file. I thought this might be usefil if you do try to re-compile the app after changing your credentials.
 ## Steps to run my container
 1. Create a Dataproc cluster 
 2. [Create a GCP service account for the cluster](https://console.cloud.google.com/projectselector/iam-admin/serviceaccounts/create?supportedpurview=project)
@@ -24,7 +25,7 @@ Final project option 2 for CS1660
 5. [Install XMing](https://sourceforge.net/projects/xming/). This will be used to send GUI information from the Docker container to your local machine.
 6. Run the XLaunch application, ensure `No access control` is checked
 7. Replace the IP address next to `ENV` in my Dockerfile with that of your local machine
-8. Edit the `LocalApp.java` source code, replacing all cluster and authentication information with your own.
+8. Edit the `LocalApp.java` source code, replacing all cluster and authentication information with your own. You will have to replace the name of the GCP credential file, project ID, region, and cluster name. Make sure the GCP JSON file is in the same folder as the dockerfile. 
 9. Download the dependencies for the `LocalApp.java` file and add them to the classpath. I did this using Maven, but feel free to do this however you wish. If you have the dependencies configured correctly, you should be able to run the application locally.
 10. Re-compile the `LocalApp.java` file into a JAR, including the dependencies. This jar file will be executed in the Docker container. I used Maven for this as well, but you can use VSCode, Gradle, etc.
 11. In your new Dataproc cluster, create a folder named `input`. Then, extract the sample data provided on Canvas to that folder. There should not be any subdirectories in the `input` folder
