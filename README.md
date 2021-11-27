@@ -2,6 +2,7 @@
 Final project option 2 for CS1660
 
 [Code walkthrough / demo](https://youtu.be/wAWOBUlBW6U)
+
 ## Assumptions / additional information
 1. Input data is stored on the GCP storage bucket already. It was mentioned that this was okay to do during lecture. The input data itself is from the sample data provided, I just extracted everything into one folder.
 2. The .jar files for the inverted index and top N alogrithms are already stored on the same GCP bucket as the input data
@@ -13,7 +14,8 @@ Final project option 2 for CS1660
 8. My local application uses the GCP client libraries. You will have to install them as Java dependencies in order to run the local application.
 9. Since my local application uses hard-coded GCP cluster information. You will have to edit the source java file in order to get it working for your own clusters. You will then have to download the dependencies or extract them from the provided .jar file in order to re-compile that source code. 
 10. Basic errors are handled by the application, such as no results for a search or non-integer input for top-N. These are not demoed in the video(to save time) but should be noted just in case that is evaluated.
-11. Apostrophes are not removed in my inverted index algorithm. This is to avoid splitting contractions, all other special characters are removed.
+11. Apostrophes are not removed in my inverted index algorithm. This is to avoid splitting contractions, all other special characters are removed
+12. Note: The errors in the code demo are because I had opened the code in the repository and not the code in the java projects I was using to test them
 ## Steps to run my container
 1. Create a Dataproc cluster 
 2. [Create a GCP service account for the cluster](https://console.cloud.google.com/projectselector/iam-admin/serviceaccounts/create?supportedpurview=project)
