@@ -1,5 +1,6 @@
 # cs1660-final-project
 Final project option 2 for CS1660
+
 [Code walkthrough / demo](https://youtu.be/wAWOBUlBW6U)
 ## Assumptions / additional information
 1. Input data is stored on the GCP storage bucket already. It was mentioned that this was okay to do during lecture. The input data itself is from the sample data provided, I just extracted everything into one folder.
