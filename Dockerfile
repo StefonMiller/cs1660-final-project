@@ -1,12 +1,11 @@
-FROM openjdk:8
-COPY LocalApp.java /usr/src/myapp
-WORKDIR /usr/src/myapp
-ENV GOOGLE_APPLICATION_CREDENTIALS="cs1660-final-project-330314-d75d36291df2.json"
+FROM openjdk:17-jdk-oraclelinux7
+COPY LocalApp.jar /usr/src/
+COPY cs1660-final-project-330314-9fdcd0afe32b.json /usr/src/
+WORKDIR /usr/src
+ENV GOOGLE_APPLICATION_CREDENTIALS="cs1660-final-project-330314-9fdcd0afe32b.json"
 ENV DISPLAY=172.26.32.1:0.0
-# RUN curl -sSL https://sdk.cloud.google.com | bash
-RUN apt-get update && apt-get install -y \
-    libxrender1 \
-    libxtst6 \
-    libxi6
-RUN javac LocalApp.java
-CMD ["java", "LocalApp"]
+RUN yum install -y \
+    libXext.x86_64 \
+    libXrender.x86_64 \
+    libXtst.x86_64
+CMD ["java", "-jar", "--enable-preview", "LocalApp.jar"]

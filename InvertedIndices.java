@@ -1,3 +1,4 @@
+import java.util.*;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 public class InvertedIndices 
 {
@@ -41,24 +43,25 @@ public class InvertedIndices
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException 
         {
 
-            // Split document ID and text
-            String DocId = value.toString().substring(0, value.toString().indexOf("\t"));
-            String value_raw =  value.toString().substring(value.toString().indexOf("\t") + 1);
+            // Get file where the current split is from
+            String fileName = ((FileSplit) context.getInputSplit()).getPath().getName();
+            // Get the string value of the current split
+            String valueString = value.toString();
             
             // Tokenize input by hyphen and space
-            StringTokenizer itr = new StringTokenizer(value_raw, " '-");
+            StringTokenizer itr = new StringTokenizer(valueString, " -");
             
             // Loop through all words in the line
             while (itr.hasMoreTokens()) 
             {
-                // Remove special characters
-                word.set(itr.nextToken().toLowerCase());
+                // Remove special characters, tabs, and newlines, and make everyting lowercase
+                word.set(itr.nextToken().replaceAll("[^a-zA-Z ']", "").replaceAll("[\\n\\t ]", "").toLowerCase());
 
                 // Make sure string isn't empty or in the stop list before counting it
                 if(word.toString() != "" && !word.toString().isEmpty() && !stopWords.contains(word.toString()))
                 {
-                    // Write word with its associated count to the reducer
-                    context.write(word, new Text(DocId));
+                    // Write word with its associated file to the reducer
+                    context.write(word, new Text(fileName));
                 }
             }
         }
@@ -69,30 +72,32 @@ public class InvertedIndices
         // Aggregate word counts sent by mapper
         public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
         {
-            // Stores counts for each word
-            HashMap<String,Integer> map = new HashMap<String,Integer>();
+            // Stores counts for each word + file pair
+            HashMap<String,Integer> counts = new HashMap<String,Integer>();
 
             for (Text val : values) 
             {
                 // Increment dictionary value if it exists. If not add the word to the dict
-                if (map.containsKey(val.toString())) 
+                if (counts.containsKey(val.toString())) 
                 {
-                    map.put(val.toString(), map.get(val.toString()) + 1);
+                    counts.put(val.toString(), counts.get(val.toString()) + 1);
                 } 
                 else 
                 {
-                    map.put(val.toString(), 1);
+                    counts.put(val.toString(), 1);
                 }
             }
 
             //After getting all values for the word, write the results
-            StringBuilder docValueList = new StringBuilder();
-            for(String docID : map.keySet())
+            ArrayList<String> fileCounts = new ArrayList<String>();
+            for(String word : counts.keySet())
             {
-                docValueList.append(docID + ":" + map.get(docID) + " ");
+                fileCounts.add(word + ":" + counts.get(word));
             }
 
-            context.write(key, new Text(docValueList.toString()));
+            String outputString = String.join(",", fileCounts);
+
+            context.write(key, new Text(outputString));
         }
     }
 
@@ -100,7 +105,7 @@ public class InvertedIndices
     {
         Configuration config = new Configuration();
         Job job = Job.getInstance(config, "inverted index");
-        job.setJarByClass(InvertedIndex.class);
+        job.setJarByClass(InvertedIndices.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setReducerClass(IntSumReducer.class);
         job.setOutputKeyClass(Text.class);
