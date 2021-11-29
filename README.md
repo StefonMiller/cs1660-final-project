@@ -15,7 +15,7 @@ Final project option 2 for CS1660
 9. Since my local application uses hard-coded GCP cluster information. You will have to edit the source java file in order to get it working for your own clusters. You will then have to download the dependencies or extract them from the provided .jar file in order to re-compile that source code. 
 10. Basic errors are handled by the application, such as no results for a search or non-integer input for top-N. These are not demoed in the video(to save time) but should be noted just in case that is evaluated.
 11. Apostrophes are not removed in my inverted index algorithm. This is to avoid splitting contractions, all other special characters are removed
-12. Note: The errors in the code demo are because I had opened the code in the repository and not the code in the java projects I was using to test them
+12. Note: The errors in the code demo are because I had opened the code in the repository folder and not the development environment I was coding in
 13. After recording the code walkthrough, I added a `dependency` folder. This has all the dependencies I used when creating the `LocalApp.jar` file. I thought this might be usefil if you do try to re-compile the app after changing your credentials.
 ## Steps to run my container
 1. Create a Dataproc cluster 
